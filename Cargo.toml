@@ -1,0 +1,18 @@
+[package]
+name = "hello-quinnet"
+version = "0.1.0"
+edition = "2021"
+authors = ["Kneelawk <kneelawk@gmail.com>"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+bevy = "0.9.1"
+bevy_quinnet = "0.3.0"
+clap = { version = "4.1.6", features = ["derive"] }
+
+[profile.dev]
+opt-level = 1
+
+[profile.dev.package."*"]
+opt-level = 3
