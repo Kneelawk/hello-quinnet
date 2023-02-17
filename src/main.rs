@@ -1,3 +1,4 @@
+#[allow(unused_imports)]
 #[macro_use]
 extern crate tracing;
 
@@ -32,12 +33,14 @@ fn main() {
 
     let mut app = App::new();
 
+    common::setup(&mut app);
+
     match args.command {
         Command::Client(args) => {
-            client::add_plugins(&mut app, args);
+            client::setup(&mut app, args);
         }
         Command::Server(args) => {
-            server::add_plugins(&mut app, args);
+            server::setup(&mut app, args);
         }
     }
 
