@@ -3,6 +3,7 @@ name = "hello-quinnet"
 version = "0.1.0"
 edition = "2021"
 authors = ["Kneelawk <kneelawk@gmail.com>"]
+description = "Simple client/server program built on Bevy and Quinn to mess around with networking code"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -10,6 +11,8 @@ authors = ["Kneelawk <kneelawk@gmail.com>"]
 bevy = "0.9.1"
 bevy_quinnet = "0.3.0"
 clap = { version = "4.1.6", features = ["derive"] }
+dotenv = "0.15.0"
+tracing = "0.1.37"
 
 [profile.dev]
 opt-level = 1
