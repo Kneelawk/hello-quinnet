@@ -11,7 +11,7 @@ use clap::{Parser, Subcommand};
 
 /// Simple client/server program built on Bevy and Quinn to mess around with networking code.
 #[derive(Parser, Debug)]
-struct CLI {
+struct Cli {
     #[command(subcommand)]
     command: Command,
 }
@@ -29,7 +29,7 @@ enum Command {
 fn main() {
     dotenv::dotenv().ok();
 
-    let args = CLI::parse();
+    let args = Cli::parse();
 
     let mut app = App::new();
 
