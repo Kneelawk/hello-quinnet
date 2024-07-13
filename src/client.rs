@@ -1,4 +1,4 @@
-use crate::common::{C2SMsg, channels, S2CMsg};
+use crate::common::{channels, C2SMsg, S2CMsg};
 use bevy::prelude::*;
 use bevy::window::ExitCondition;
 use bevy_quinnet::client::certificate::{CertificateVerificationMode, TrustOnFirstUseConfig};
@@ -12,7 +12,6 @@ use bevy_rapier2d::prelude::*;
 use clap::Args;
 use std::net::{IpAddr, Ipv4Addr};
 use std::str::FromStr;
-use crate::common::{RequestShutdown, ShuttingDown};
 
 #[derive(Debug, Default, Component)]
 pub struct ClientPlayer;
@@ -38,8 +37,7 @@ pub fn setup(app: &mut App, args: ClientArgs) {
             title: "Hello Quinnet".to_string(),
             ..Default::default()
         }),
-        exit_condition: ExitCondition::DontExit,
-        close_when_requested: true,
+        exit_condition: ExitCondition::OnAllClosed,
         ..Default::default()
     }));
     app.add_plugins(QuinnetClientPlugin::default());
@@ -54,10 +52,9 @@ impl Plugin for ClientPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Startup, connect_to_server);
         app.add_systems(Update, disconnect_handler);
-        app.add_systems(PostUpdate, window_close_handler);
-        app.add_systems(Update, shutdown_disconnect);
         app.add_systems(Update, connect_handler);
         app.add_systems(Update, message_handler);
+        app.add_systems(Last, shutdown_disconnect);
     }
 }
 
@@ -80,22 +77,15 @@ fn connect_to_server(args: Res<ClientArgs>, mut client: ResMut<QuinnetClient>) {
 
 fn disconnect_handler(
     mut event: EventReader<ConnectionLostEvent>,
-    mut shutdown: EventWriter<RequestShutdown>,
+    mut shutdown: EventWriter<AppExit>,
 ) {
     for _ in event.read().take(1) {
         info!("Connection lost. Shutting down.");
-        shutdown.send(RequestShutdown);
+        shutdown.send(AppExit::Success);
     }
 }
 
-fn window_close_handler(windows: Query<&Window>, mut shutdown: EventWriter<RequestShutdown>) {
-    if windows.is_empty() {
-        info!("All windows closed. Shutting down...");
-        shutdown.send(RequestShutdown);
-    }
-}
-
-fn shutdown_disconnect(mut shutdown: EventReader<ShuttingDown>, client: Res<QuinnetClient>) {
+fn shutdown_disconnect(mut shutdown: EventReader<AppExit>, client: Res<QuinnetClient>) {
     for _ in shutdown.read().take(1) {
         if client.connection().state() == ConnectionState::Connected {
             info!("Sending disconnect...");
@@ -117,7 +107,7 @@ fn connect_handler(mut events: EventReader<ConnectionEvent>, client: Res<Quinnet
     }
 }
 
-fn message_handler(mut client: ResMut<QuinnetClient>, mut shutdown: EventWriter<RequestShutdown>) {
+fn message_handler(mut client: ResMut<QuinnetClient>, mut shutdown: EventWriter<AppExit>) {
     while let Ok(Some((_channel_id, msg))) = client.connection_mut().receive_message::<S2CMsg>() {
         match msg {
             S2CMsg::Pong => {
@@ -125,7 +115,7 @@ fn message_handler(mut client: ResMut<QuinnetClient>, mut shutdown: EventWriter<
             }
             S2CMsg::Disconnect => {
                 info!("Server disconnect received. Shutting down...");
-                shutdown.send(RequestShutdown);
+                shutdown.send(AppExit::Success);
             }
         }
     }

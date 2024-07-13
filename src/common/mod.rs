@@ -2,14 +2,12 @@ pub mod channels;
 mod components;
 mod events;
 mod messages;
-mod shutdown;
 
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 use std::sync::atomic::{AtomicBool, Ordering};
 
 pub use messages::*;
-pub use shutdown::*;
 
 static CTRL_C: AtomicBool = AtomicBool::new(false);
 
@@ -27,16 +25,11 @@ pub fn setup(app: &mut App) {
     });
 
     // Common stuff
-    app.add_event::<RequestShutdown>();
-    app.add_event::<ShuttingDown>();
-    app.add_event::<PostShutdown>();
-    app.insert_resource(ShutdownState::None);
-    app.add_systems(PreUpdate, ctrlc_handler);
-    app.add_systems(Last, shutdown_handler);
+    app.add_systems(PostUpdate, ctrlc_handler);
 }
 
-fn ctrlc_handler(mut event: EventWriter<RequestShutdown>) {
+fn ctrlc_handler(mut event: EventWriter<AppExit>) {
     if CTRL_C.load(Ordering::Acquire) {
-        event.send(RequestShutdown);
+        event.send(AppExit::Success);
     }
 }

@@ -11,7 +11,6 @@ use bevy_quinnet::shared::channels::ChannelsConfiguration;
 use clap::Args;
 use std::net::{IpAddr, Ipv4Addr};
 use std::time::Duration;
-use crate::common::ShuttingDown;
 
 #[derive(Args, Resource, Debug)]
 pub struct ServerArgs {
@@ -37,10 +36,10 @@ struct ServerPlugin;
 impl Plugin for ServerPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Startup, start_server);
-        app.add_systems(Update, shutdown_disconnect);
         app.add_systems(Update, connect_handler);
         app.add_systems(Update, disconnect_handler);
         app.add_systems(Update, message_handler);
+        app.add_systems(Last, shutdown_disconnect);
     }
 }
 
@@ -61,7 +60,7 @@ fn start_server(args: Res<ServerArgs>, mut server: ResMut<QuinnetServer>) {
         .expect("Error starting server");
 }
 
-fn shutdown_disconnect(mut exit: EventReader<ShuttingDown>, mut server: ResMut<QuinnetServer>) {
+fn shutdown_disconnect(mut exit: EventReader<AppExit>, mut server: ResMut<QuinnetServer>) {
     for _ in exit.read().take(1) {
         let endpoint = server.endpoint_mut();
         info!("Disconnecting all clients...");
