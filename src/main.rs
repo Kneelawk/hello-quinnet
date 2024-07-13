@@ -44,5 +44,5 @@ fn main() {
         }
     }
 
-    app.run()
+    app.run();
 }

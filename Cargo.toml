@@ -8,14 +8,14 @@ description = "Simple client/server program built on Bevy and Quinn to mess arou
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-bevy = "0.9.1"
-bevy_quinnet = "0.3.0"
-bevy_rapier2d = { version = "0.20.0", features = ["parallel", "simd-nightly"] }
-clap = { version = "4.1.6", features = ["derive"] }
-ctrlc = "3.2.5"
+bevy = { version = "0.14.0", features = ["wayland"] }
+bevy_quinnet = "0.9.0"
+bevy_rapier2d = { version = "0.27.0", features = ["parallel", "simd-nightly"] }
+clap = { version = "4.5.9", features = ["derive"] }
+ctrlc = "3.4.4"
 dotenv = "0.15.0"
-serde = { version = "1.0.152", features = ["derive"] }
-tracing = "0.1.37"
+serde = { version = "1.0.204", features = ["derive"] }
+tracing = "0.1.40"
 
 [profile.dev]
 opt-level = 1
