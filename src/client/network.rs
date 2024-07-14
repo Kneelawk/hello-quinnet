@@ -3,9 +3,10 @@ use crate::common::{channels, C2SMsg, S2CMsg};
 use bevy::app::{App, AppExit, Startup};
 use bevy::prelude::*;
 use bevy_quinnet::client::certificate::{CertificateVerificationMode, TrustOnFirstUseConfig};
-use bevy_quinnet::client::connection::{ClientEndpointConfiguration, ConnectionState};
+use bevy_quinnet::client::connection::{
+    ClientEndpointConfiguration, ConnectionEvent, ConnectionLostEvent, ConnectionState,
+};
 use bevy_quinnet::client::QuinnetClient;
-use bevy_quinnet::server::{ConnectionEvent, ConnectionLostEvent};
 use bevy_quinnet::shared::channels::ChannelsConfiguration;
 use std::net::Ipv4Addr;
 use std::net::{SocketAddr, SocketAddrV4, ToSocketAddrs};
