@@ -7,8 +7,8 @@ use bevy_quinnet::client::connection::{ClientEndpointConfiguration, ConnectionSt
 use bevy_quinnet::client::QuinnetClient;
 use bevy_quinnet::server::{ConnectionEvent, ConnectionLostEvent};
 use bevy_quinnet::shared::channels::ChannelsConfiguration;
-use std::net::{IpAddr, Ipv4Addr};
-use std::str::FromStr;
+use std::net::Ipv4Addr;
+use std::net::{SocketAddr, SocketAddrV4, ToSocketAddrs};
 
 pub fn setup(app: &mut App) {
     app.add_systems(Startup, connect_to_server);
@@ -23,11 +23,13 @@ pub fn connect_to_server(args: Res<ClientArgs>, mut client: ResMut<QuinnetClient
 
     client
         .open_connection(
-            ClientEndpointConfiguration::from_ips(
-                IpAddr::from_str(&args.server).expect("Error parsing ip"),
-                args.port,
-                IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0)),
-                0,
+            ClientEndpointConfiguration::from_addrs(
+                (args.server.as_str(), args.port)
+                    .to_socket_addrs()
+                    .expect("The given hostname does not resolve")
+                    .next()
+                    .expect("The given hostname does not resolve"),
+                SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::new(0, 0, 0, 0), 0)),
             ),
             CertificateVerificationMode::TrustOnFirstUse(TrustOnFirstUseConfig::default()),
             ChannelsConfiguration::from_types(channels::CHANNELS.to_vec()).unwrap(),
