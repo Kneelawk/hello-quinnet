@@ -2,6 +2,7 @@
 #[macro_use]
 extern crate tracing;
 
+#[cfg(feature = "client")]
 mod client;
 mod common;
 mod server;
@@ -20,6 +21,7 @@ struct Cli {
 #[derive(Subcommand, Debug)]
 enum Command {
     /// Start a client process.
+    #[cfg(feature = "client")]
     Client(client::ClientArgs),
 
     /// Start a server process.
@@ -36,6 +38,7 @@ fn main() {
     common::setup(&mut app);
 
     match args.command {
+        #[cfg(feature = "client")]
         Command::Client(args) => {
             client::setup(&mut app, args);
         }

@@ -7,6 +7,10 @@ description = "Simple client/server program built on Bevy and Quinn to mess arou
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[features]
+client = []
+default = ["client"]
+
 [dependencies]
 bevy = { version = "0.14.0", features = ["wayland"] }
 bevy_quinnet = "0.9.0"
