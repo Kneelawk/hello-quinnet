@@ -5,7 +5,7 @@ mod messages;
 
 use bevy::prelude::*;
 use std::sync::atomic::{AtomicBool, Ordering};
-
+use avian2d::PhysicsPlugins;
 pub use messages::*;
 
 static CTRL_C: AtomicBool = AtomicBool::new(false);
@@ -22,10 +22,13 @@ pub fn setup(app: &mut App) {
     //     gravity: Vec2::ZERO,
     //     ..RapierConfiguration::new(16.0)
     // });
+    app.add_plugins(PhysicsPlugins::default().with_length_unit(8.0));
+    app.insert_resource(SceneSpawner::default());
 
     // Common stuff
     app.add_systems(PostUpdate, ctrlc_handler);
 }
+
 
 fn ctrlc_handler(mut event: EventWriter<AppExit>) {
     if CTRL_C.load(Ordering::Acquire) {

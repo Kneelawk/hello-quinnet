@@ -12,6 +12,7 @@ client = []
 default = ["client"]
 
 [dependencies]
+avian2d = { git = "https://github.com/Jondolf/avian", branch = "main" }
 bevy = { version = "0.16.0", features = ["wayland"] }
 bevy_quinnet = "0.17.0"
 clap = { version = "4.5.37", features = ["derive"] }
