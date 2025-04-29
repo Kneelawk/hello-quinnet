@@ -44,27 +44,27 @@ pub fn disconnect_handler(
 ) {
     for _ in event.read().take(1) {
         info!("Connection lost. Shutting down.");
-        shutdown.send(AppExit::Success);
+        shutdown.write(AppExit::Success);
     }
 }
 
-pub fn shutdown_disconnect(mut shutdown: EventReader<AppExit>, client: Res<QuinnetClient>) {
+pub fn shutdown_disconnect(mut shutdown: EventReader<AppExit>, mut client: ResMut<QuinnetClient>) {
     for _ in shutdown.read().take(1) {
         if client.connection().state() == ConnectionState::Connected {
             info!("Sending disconnect...");
             client
-                .connection()
+                .connection_mut()
                 .send_message_on(channels::ORDERED_RELIABLE, C2SMsg::Disconnect)
                 .ok();
         }
     }
 }
 
-pub fn connect_handler(mut events: EventReader<ConnectionEvent>, client: Res<QuinnetClient>) {
+pub fn connect_handler(mut events: EventReader<ConnectionEvent>, mut client: ResMut<QuinnetClient>) {
     for _ in events.read() {
         info!("Sending ping...");
         client
-            .connection()
+            .connection_mut()
             .send_message_on(channels::UNORDERED_RELIABLE, C2SMsg::Ping)
             .ok();
     }
@@ -78,7 +78,7 @@ pub fn message_handler(mut client: ResMut<QuinnetClient>, mut shutdown: EventWri
             }
             S2CMsg::Disconnect => {
                 info!("Server disconnect received. Shutting down...");
-                shutdown.send(AppExit::Success);
+                shutdown.write(AppExit::Success);
             }
         }
     }

@@ -30,6 +30,6 @@ pub fn setup(app: &mut App) {
 
 fn ctrlc_handler(mut event: EventWriter<AppExit>) {
     if CTRL_C.load(Ordering::Acquire) {
-        event.send(AppExit::Success);
+        event.write(AppExit::Success);
     }
 }

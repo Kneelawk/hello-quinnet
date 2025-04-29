@@ -69,7 +69,7 @@ fn shutdown_disconnect(mut exit: EventReader<AppExit>, mut server: ResMut<Quinne
             channels::ORDERED_RELIABLE,
             S2CMsg::Disconnect,
         );
-        endpoint.disconnect_all_clients().ok();
+        endpoint.disconnect_all_clients();
     }
 }
 
@@ -88,7 +88,7 @@ fn disconnect_handler(mut events: EventReader<ConnectionLostEvent>) {
 fn message_handler(mut server: ResMut<QuinnetServer>) {
     let endpoint = server.endpoint_mut();
     for client in endpoint.clients() {
-        if endpoint.connection_stats(client).is_some() {
+        if endpoint.get_connection_stats(client).is_some() {
             while let Some((_channel_id, msg)) = endpoint.try_receive_message_from::<C2SMsg>(client)
             {
                 match msg {
