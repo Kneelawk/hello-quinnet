@@ -4,7 +4,6 @@ mod events;
 mod messages;
 
 use bevy::prelude::*;
-use bevy_rapier2d::prelude::*;
 use std::sync::atomic::{AtomicBool, Ordering};
 
 pub use messages::*;
@@ -18,11 +17,11 @@ pub fn setup(app: &mut App) {
     .expect("Error setting Ctrl-C handler");
 
     // Physics
-    app.add_plugins(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(16.0));
-    app.insert_resource(RapierConfiguration {
-        gravity: Vec2::ZERO,
-        ..RapierConfiguration::new(16.0)
-    });
+    // app.add_plugins(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(16.0));
+    // app.insert_resource(RapierConfiguration {
+    //     gravity: Vec2::ZERO,
+    //     ..RapierConfiguration::new(16.0)
+    // });
 
     // Common stuff
     app.add_systems(PostUpdate, ctrlc_handler);

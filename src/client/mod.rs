@@ -4,7 +4,6 @@ mod player;
 use bevy::prelude::*;
 use bevy::window::ExitCondition;
 use bevy_quinnet::client::QuinnetClientPlugin;
-use bevy_rapier2d::prelude::*;
 use clap::Args;
 
 #[derive(Args, Resource, Debug)]
@@ -27,7 +26,7 @@ pub fn setup(app: &mut App, args: ClientArgs) {
         ..Default::default()
     }));
     app.add_plugins(QuinnetClientPlugin::default());
-    app.add_plugins(RapierDebugRenderPlugin::default());
+    // app.add_plugins(RapierDebugRenderPlugin::default());
     app.add_plugins(ClientPlugin);
     app.insert_resource(args);
 }
