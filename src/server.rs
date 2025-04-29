@@ -1,12 +1,9 @@
-use crate::common::{C2SMsg, channels, S2CMsg};
+use crate::common::{C2SMsg, S2CMsg, channels};
 use bevy::app::ScheduleRunnerPlugin;
 use bevy::log::LogPlugin;
 use bevy::prelude::*;
 use bevy_quinnet::server::certificate::CertificateRetrievalMode;
-use bevy_quinnet::server::{
-    ConnectionEvent, ConnectionLostEvent, QuinnetServer, QuinnetServerPlugin,
-    ServerEndpointConfiguration,
-};
+use bevy_quinnet::server::{ConnectionEvent, ConnectionLostEvent, QuinnetServer, QuinnetServerPlugin, ServerEndpointConfiguration, ServerMessageReceiveError, ServerReceiveError};
 use bevy_quinnet::shared::channels::ChannelsConfiguration;
 use clap::Args;
 use std::net::{IpAddr, Ipv4Addr};
@@ -88,21 +85,32 @@ fn disconnect_handler(mut events: EventReader<ConnectionLostEvent>) {
 fn message_handler(mut server: ResMut<QuinnetServer>) {
     let endpoint = server.endpoint_mut();
     for client in endpoint.clients() {
-        if endpoint.get_connection_stats(client).is_some() {
-            while let Some((_channel_id, msg)) = endpoint.try_receive_message_from::<C2SMsg>(client)
-            {
-                match msg {
-                    C2SMsg::Ping => {
-                        info!("Received ping!");
-                        info!("Sending pong...");
-                        endpoint
-                            .send_message_on(client, channels::UNORDERED_RELIABLE, S2CMsg::Pong)
-                            .ok();
-                    }
-                    C2SMsg::Disconnect => {
-                        info!("Client disconnect received: {}", client);
-                        endpoint.disconnect_client(client).ok();
-                    }
+        loop {
+            let msg = endpoint.receive_message_from::<C2SMsg>(client);
+            if msg.is_err() {
+                if let Err(ServerMessageReceiveError::ReceiveError(ServerReceiveError::ConnectionClosed)) = msg {
+                    info!("Client disconnected: {}", client);
+                }
+                break;
+            }
+
+            let msg = msg.unwrap();
+            if msg.is_none() {
+                break;
+            }
+
+            let (_channel_id, msg) = msg.unwrap();
+            match msg {
+                C2SMsg::Ping => {
+                    info!("Received ping!");
+                    info!("Sending pong...");
+                    endpoint
+                        .send_message_on(client, channels::UNORDERED_RELIABLE, S2CMsg::Pong)
+                        .ok();
+                }
+                C2SMsg::Disconnect => {
+                    info!("Client disconnect received: {}", client);
+                    endpoint.disconnect_client(client).ok();
                 }
             }
         }
