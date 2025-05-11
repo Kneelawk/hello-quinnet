@@ -1,10 +1,5 @@
 use bevy::prelude::Component;
-use bevy_quinnet::shared::ClientId;
 
+/// Marks a player entity as the one controlled by this client.
 #[derive(Debug, Default, Component, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
 pub struct ClientPlayer;
-
-#[derive(Debug, Default, Component, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
-pub struct OtherPlayer {
-    id: ClientId,
-}

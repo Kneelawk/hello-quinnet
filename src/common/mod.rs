@@ -1,12 +1,15 @@
 pub mod channels;
-mod components;
-mod events;
+pub mod components;
+pub mod events;
 mod messages;
 
 use bevy::prelude::*;
 use std::sync::atomic::{AtomicBool, Ordering};
 use avian2d::PhysicsPlugins;
 pub use messages::*;
+
+/// The default port that servers are hosted on
+pub const DEFAULT_PORT: u16 = 22223;
 
 static CTRL_C: AtomicBool = AtomicBool::new(false);
 

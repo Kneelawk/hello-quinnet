@@ -1,5 +1,6 @@
 mod network;
 mod player;
+mod ui;
 
 use bevy::prelude::*;
 use bevy::window::ExitCondition;
@@ -8,12 +9,7 @@ use clap::Args;
 
 #[derive(Args, Resource, Debug)]
 pub struct ClientArgs {
-    /// The ip or domain name of the server to connect to.
-    server: String,
-
-    /// The port of the server to connect to.
-    #[arg(short, long, default_value_t = 22223)]
-    port: u16,
+    // TODO: graphics args
 }
 
 pub fn setup(app: &mut App, args: ClientArgs) {
@@ -36,5 +32,6 @@ struct ClientPlugin;
 impl Plugin for ClientPlugin {
     fn build(&self, app: &mut App) {
         network::setup(app);
+        ui::setup(app);
     }
 }
